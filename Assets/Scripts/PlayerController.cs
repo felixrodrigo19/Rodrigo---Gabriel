@@ -8,19 +8,42 @@ public class PlayerController : MonoBehaviour
 {
     public float m_velocityMove = 10f;
     public float m_jumpHeight = 4f;
+    public Camera player;
+    public float sensitivity = 100f;
 
+    float horizontalRotation = 0f;
     CharacterController m_controller;
     bool m_isGrounded;
     float m_gravity = -9.80665f;
     Vector3 velocity;
+
     void Start()
     {
         m_controller = GetComponent<CharacterController>();
     }
 
+    void FixedUpdate()
+    {
+        var mouse = Input.mousePresent;
+
+        if (!mouse) Debug.LogWarning("Mouse não conectado");
+    }
     void Update()
     {
+        FirstPersonLook();
         Controller();
+    }
+
+    void FirstPersonLook()
+    {
+        float mouseHorizontal = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
+        float mouseVertical = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+
+        horizontalRotation -= mouseVertical;
+        horizontalRotation = Mathf.Clamp(horizontalRotation, -90f, 90f);
+
+        player.transform.localRotation = Quaternion.Euler(horizontalRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseHorizontal);
     }
 
     void Controller()
